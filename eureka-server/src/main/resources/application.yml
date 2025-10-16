@@ -1,0 +1,38 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+  security:
+    # Deshabilitar autenticación básica por defecto
+    user:
+      password: # Vacío para deshabilitar
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    # Configuraciones de seguridad
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 4000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging para monitorear intentos de ataque
+logging:
+  level:
+    com.netflix.eureka: INFO
+    org.springframework.security: WARN
