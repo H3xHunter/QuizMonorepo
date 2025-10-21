@@ -14,13 +14,13 @@
   <description>Parent project for microservices architecture</description>
 
   <properties>
-    <java.version>24</java.version>
-    <spring-boot.version>3.4.0</spring-boot.version>
-    <spring-cloud.version>2024.0.0</spring-cloud.version>
-    <spring-security.version>6.4.0</spring-security.version>
-    <maven.compiler.source>24</maven.compiler.source>
-    <maven.compiler.target>24</maven.compiler.target>
-    <maven.compiler.release>24</maven.compiler.release>
+    <java.version>21</java.version>
+    <spring-boot.version>3.3.5</spring-boot.version>
+    <spring-cloud.version>2023.0.3</spring-cloud.version>
+    <spring-security.version>6.3.4</spring-security.version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -68,11 +68,11 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <configuration>
-            <source>24</source>
-            <target>24</target>
-            <release>24</release>
+            <source>21</source>
+            <target>21</target>
+            <release>21</release>
             <compilerArgs>
-              <arg>--enable-preview</arg>
+              <!-- Remover  -enable-preview para Java 21 -->
             </compilerArgs>
           </configuration>
         </plugin>

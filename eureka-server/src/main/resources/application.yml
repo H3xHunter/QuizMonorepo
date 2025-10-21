@@ -8,6 +8,9 @@ spring:
     # Deshabilitar autenticación básica por defecto
     user:
       password: # Vacío para deshabilitar
+  freemarker:
+    template-loader-path: classpath:/templates/
+    prefer-file-system-access: false
 
 eureka:
   instance:
@@ -18,9 +21,13 @@ eureka:
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
   server:
-    # Configuraciones de seguridad
+    # Configuraciones de seguridad y dashboard
     enable-self-preservation: false
     eviction-interval-timer-in-ms: 4000
+    # Habilitar dashboard web
+    dashboard:
+      enabled: true
+      path: /
 
 management:
   endpoints:
@@ -36,3 +43,4 @@ logging:
   level:
     com.netflix.eureka: INFO
     org.springframework.security: WARN
+    root: INFO
