@@ -62,3 +62,6 @@ local.properties
 # Spring Boot
 application-local.yml
 application-local.properties
+
+# Claude Code
+CLAUDE.md
