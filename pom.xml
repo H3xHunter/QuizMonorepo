@@ -27,6 +27,9 @@
   <modules>
     <module>eureka-server</module>
     <module>api-gateway</module>
+    <module>medianos-service</module>
+    <module>photos-service</module>
+    <module>auth-service</module>
     <!-- Los servicios se agregarán después -->
   </modules>
 
