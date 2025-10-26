@@ -24,14 +24,20 @@ public class MedianoController {
 
     }
     @PostMapping({"", "/"})
-    public ResponseEntity<?> addMediano(@RequestBody @Valid
+    public ResponseEntity<MedianoDTO> addMediano(@RequestBody @Valid
                                         MedianoDTO medianoDTO){
         System.out.println(medianoDTO);
-        mediano.addMediano(medianoDTO);
-        return ResponseEntity.ok().build();
+        Mediano created = mediano.addMediano(medianoDTO);
+        MedianoDTO response = new MedianoDTO(
+                created.getId(),
+                created.getName(),
+                created.getHeight(),
+                created.getEmail()
+        );
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/filtrado/{nombre}")
-    public Mediano filtrado(@PathVariable String nombre){
+    public Mediano filtrado(@PathVariable("nombre") String nombre){
         ///
         return mediano.getByName(nombre).orElse(null);
     }
@@ -42,7 +48,7 @@ public class MedianoController {
      * @return Mediano entity
      */
     @GetMapping("/{id}")
-    public Mediano getMedianoById(@PathVariable String id){
+    public Mediano getMedianoById(@PathVariable("id") String id){
         return mediano.getMedianoById(id).orElse(null);
     }
 
@@ -52,8 +58,20 @@ public class MedianoController {
      * @return Mediano with list of photos
      */
     @GetMapping("/{id}/fotos")
-    public MedianoWithPhotosDTO getMedianoWithPhotos(@PathVariable String id){
+    public MedianoWithPhotosDTO getMedianoWithPhotos(@PathVariable("id") String id){
         return mediano.getMedianoWithPhotos(id);
+    }
+
+    /**
+     * Delete mediano by ID
+     * @param id The mediano's ID
+     * @return ResponseEntity with appropriate status
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMediano(@PathVariable("id") String id){
+        return mediano.removeMediano(id)
+                .map(m -> ResponseEntity.ok().build())
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

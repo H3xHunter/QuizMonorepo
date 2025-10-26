@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 public record MedianoDTO(
+        String id,
         @NotBlank(message = "Ingresar nombre")
         String nombre,
         @Min(100)

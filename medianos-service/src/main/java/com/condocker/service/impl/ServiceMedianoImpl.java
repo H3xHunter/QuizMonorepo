@@ -30,6 +30,7 @@ public class ServiceMedianoImpl implements IMedianoService {
         return medianoDao.findAll().stream().map(
                 mediano -> {
                     return new MedianoDTO(
+                            mediano.getId(),
                             mediano.getName(),
                             mediano.getHeight(),
                             mediano.getEmail()
@@ -57,7 +58,11 @@ public class ServiceMedianoImpl implements IMedianoService {
 
     @Override
     public Optional<Mediano> removeMediano(String id) {
-        return Optional.empty();
+        Optional<Mediano> mediano = medianoDao.findById(id);
+        if (mediano.isPresent()) {
+            medianoDao.deleteById(id);
+        }
+        return mediano;
     }
 
     @Override

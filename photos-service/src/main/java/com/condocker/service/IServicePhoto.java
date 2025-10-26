@@ -16,4 +16,33 @@ public interface IServicePhoto {
      */
     public List<Photo> getPhotosByMedianoId(String medianoId);
 
+    /**
+     * Add a new photo
+     * @param photo The photo DTO
+     * @return The created photo entity
+     */
+    public Photo addPhoto(PhotoDTO photo);
+
+    /**
+     * Get photo by ID
+     * @param id The photo's ID
+     * @return Photo entity or null
+     */
+    public Photo getPhotoById(Long id);
+
+    /**
+     * Update a photo
+     * @param id The photo's ID
+     * @param photoDTO Updated photo data
+     * @return Updated photo entity or null if not found
+     */
+    public Photo updatePhoto(Long id, PhotoDTO photoDTO);
+
+    /**
+     * Delete a photo
+     * @param id The photo's ID
+     * @return True if deleted, false if not found
+     */
+    public boolean deletePhoto(Long id);
+
 }
