@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Auth Service
+  auth-db:
+    image: postgres:16-alpine
+    container_name: auth-postgres
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for Photos Service
+  photos-db:
+    image: postgres:16-alpine
+    container_name: photos-postgres
+    environment:
+      POSTGRES_DB: photos_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - photos-db-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d photos_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for Medianos Service
+  medianos-db:
+    image: postgres:16-alpine
+    container_name: medianos-postgres
+    environment:
+      POSTGRES_DB: medianos_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - medianos-db-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d medianos_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  auth-db-data:
+    driver: local
+  photos-db-data:
+    driver: local
+  medianos-db-data:
+    driver: local
+
+networks:
+  microservices-network:
+    driver: bridge

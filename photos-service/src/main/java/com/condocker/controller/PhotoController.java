@@ -19,9 +19,10 @@ public class PhotoController {
         return servicePhoto.getPhotos();
 
     }
+    /*
     @PostMapping("/")
     public void createPhoto(@RequestBody PhotoDTO photo) {
         this.servicePhoto.addPhoto(photo);
     }
-
+    */
 }
