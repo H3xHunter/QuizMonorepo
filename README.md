@@ -202,6 +202,63 @@ mvn spring-boot:run
 
 All services can be accessed through the **API Gateway** at `http://localhost:8080`.
 
+**IMPORTANT**: All API tests must go through the Gateway, not directly to services.
+
+### Gateway Routing Configuration
+
+The API Gateway uses **two routing strategies**:
+
+#### 1. Auto-Discovery Routing (Dynamic)
+
+**Enabled**: Service discovery via Eureka automatically creates routes for all registered services.
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+```
+
+**Auto-Generated Routes**:
+
+| Service in Eureka | Gateway URL Pattern | Target Service |
+|-------------------|---------------------|----------------|
+| `AUTH-SERVICE` | `http://localhost:8080/auth-service/**` | `localhost:8081` |
+| `MEDIANOS-SERVICE` | `http://localhost:8080/medianos-service/**` | `localhost:8082` |
+| `PHOTOS-SERVICE` | `http://localhost:8080/photos-service/**` | `localhost:8083` |
+
+The Gateway automatically:
+- Discovers services registered in Eureka
+- Creates routes using lowercase service names
+- Performs client-side load balancing (if multiple instances exist)
+- Rewrites paths by removing the service prefix
+
+#### 2. Explicit Routes (Manual)
+
+**Configured Routes**:
+- **Eureka Dashboard**: `http://localhost:8080/eureka/` → `http://localhost:8761`
+
+#### CORS Configuration (Development)
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+```
+
+**Status**: ✅ Configured for development
+- All origins, methods, and headers are allowed
+- **Production**: Should restrict to specific origins
+
 ### API Gateway Endpoints
 
 Base URL: `http://localhost:8080`
@@ -209,8 +266,16 @@ Base URL: `http://localhost:8080`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/actuator/health` | Gateway health status |
-| GET | `/actuator/gateway/routes` | View all registered routes |
+| GET | `/actuator/gateway/routes` | **View all active routes** (JSON) |
+| GET | `/actuator/gateway/globalfilters` | View global filters |
+| GET | `/actuator/info` | Gateway service information |
+| GET | `/actuator/metrics` | Prometheus-compatible metrics |
 | GET | `/eureka/` | Access Eureka dashboard through gateway |
+
+**Example - View Routes**:
+```bash
+curl http://localhost:8080/actuator/gateway/routes | jq
+```
 
 ---
 
