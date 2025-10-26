@@ -1,0 +1,674 @@
+{
+	"info": {
+		"_postman_id": "microservices-gateway-collection",
+		"name": "Microservices API Gateway - Complete Testing",
+		"description": "Complete Postman collection for testing Spring Boot microservices through API Gateway (localhost:8080).\n\n**Services:**\n- Auth Service (JWT authentication)\n- Medianos Service (Entity management)\n- Photos Service (Photo management with Feign integration)\n\n**Base URL:** http://localhost:8080\n\n**Prerequisites:**\n1. All services must be running\n2. PostgreSQL databases must be up\n3. Services must be registered in Eureka (check http://localhost:8761)\n\n**Test Order:**\n1. Gateway Health Checks\n2. Auth Service (register, login, get token)\n3. Medianos Service (CRUD operations)\n4. Photos Service (CRUD + Feign integration)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Gateway & Infrastructure",
+			"item": [
+				{
+					"name": "Gateway Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Check if API Gateway is running and healthy"
+					},
+					"response": []
+				},
+				{
+					"name": "View All Gateway Routes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/gateway/routes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"gateway",
+								"routes"
+							]
+						},
+						"description": "View all active routes configured in the API Gateway.\n\nExpected routes:\n- /auth-service/**\n- /medianos-service/**\n- /photos-service/**"
+					},
+					"response": []
+				},
+				{
+					"name": "Eureka Dashboard (via Gateway)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/eureka/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"eureka",
+								""
+							]
+						},
+						"description": "Access Eureka dashboard through the API Gateway"
+					},
+					"response": []
+				}
+			],
+			"description": "Test API Gateway health and infrastructure endpoints"
+		},
+		{
+			"name": "Auth Service",
+			"item": [
+				{
+					"name": "Register New User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save token if registration returns one",
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.environment.set(\"jwt_token\", jsonData.token);",
+									"        console.log(\"JWT token saved to environment\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth-service/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth-service",
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user in the Auth Service.\n\n**Expected Response:**\n- 200/201: User created successfully\n- May return JWT token immediately"
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Automatically save JWT token from response",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.environment.set(\"jwt_token\", jsonData.token);",
+									"        console.log(\"JWT token saved: \" + jsonData.token.substring(0, 20) + \"...\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth-service/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth-service",
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate user and receive JWT token.\n\n**Test Script:**\nAutomatically saves JWT token to Postman environment variable `jwt_token`.\n\n**Expected Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiIs...\",\n    \"type\": \"Bearer\",\n    \"username\": \"testuser\"\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Auth Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/auth-service/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth-service",
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Check Auth Service health status through Gateway"
+					},
+					"response": []
+				}
+			],
+			"description": "JWT Authentication and User Management\n\n**Endpoints:**\n- POST /register - Create new user\n- POST /login - Authenticate and get JWT\n- GET /me - Get current user profile\n\n**Authentication:**\nLogin returns JWT token that is automatically saved to `{{jwt_token}}` variable for use in other requests."
+		},
+		{
+			"name": "Medianos Service",
+			"item": [
+				{
+					"name": "Create Mediano",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save created mediano ID for later use",
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.environment.set(\"mediano_id\", jsonData.id);",
+									"        console.log(\"Mediano ID saved: \" + jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Juan Perez\",\n    \"altura\": 130,\n    \"email\": \"juan.perez@example.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/medianos-service/api/medianos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"medianos-service",
+								"api",
+								"medianos",
+								""
+							]
+						},
+						"description": "Create a new Mediano entity.\n\n**Test Script:**\nAutomatically saves created ID to `{{mediano_id}}` variable.\n\n**Expected Response:**\n```json\n{\n    \"id\": 1,\n    \"name\": \"Test Mediano\",\n    \"description\": \"A test mediano entity\",\n    \"category\": \"Category A\",\n    \"status\": \"ACTIVE\",\n    \"value\": 100.50,\n    \"createdAt\": \"2025-10-26T...\"\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Medianos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save first mediano ID if list is not empty",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.length > 0 && jsonData[0].id) {",
+									"        pm.environment.set(\"mediano_id\", jsonData[0].id);",
+									"        console.log(\"First Mediano ID saved: \" + jsonData[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/medianos-service/api/medianos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"medianos-service",
+								"api",
+								"medianos",
+								""
+							]
+						},
+						"description": "Retrieve all Medianos from the database.\n\n**Expected Response:**\n```json\n[\n    {\n        \"id\": \"uuid-here\",\n        \"nombre\": \"Juan Perez\",\n        \"altura\": 130,\n        \"email\": \"juan.perez@example.com\"\n    }\n]\n```\n\n**Test Script:** Automatically saves first mediano's ID to {{mediano_id}} variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Mediano by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/medianos-service/api/medianos/{{mediano_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"medianos-service",
+								"api",
+								"medianos",
+								"{{mediano_id}}"
+							]
+						},
+						"description": "Get a specific Mediano by ID.\n\n**Uses:** `{{mediano_id}}` from Create Mediano request.\n\n**Manual Override:** Replace `{{mediano_id}}` with actual ID (e.g., `/api/medianos/1`)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Mediano",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Mediano Name\",\n    \"description\": \"Updated description\",\n    \"category\": \"Category B\",\n    \"status\": \"INACTIVE\",\n    \"value\": 250.75\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/medianos-service/api/medianos/{{mediano_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"medianos-service",
+								"api",
+								"medianos",
+								"{{mediano_id}}"
+							]
+						},
+						"description": "Update an existing Mediano.\n\n**Uses:** `{{mediano_id}}` variable"
+					},
+					"response": []
+				},
+				{
+					"name": "Medianos Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/medianos-service/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"medianos-service",
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Check Medianos Service health through Gateway"
+					},
+					"response": []
+				}
+			],
+			"description": "Medianos entity management (CRUD operations)\n\n**Base Path:** `/medianos-service/api/medianos`\n\n**Operations:**\n- POST / - Create mediano\n- GET / - List all medianos\n- GET /{id} - Get by ID\n- PUT /{id} - Update mediano\n- \n\n**Authentication:** Requires JWT token from Auth Service"
+		},
+		{
+			"name": "Photos Service",
+			"item": [
+				{
+					"name": "Create Photo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save created photo ID",
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.environment.set(\"photo_id\", jsonData.id);",
+									"        console.log(\"Photo ID saved: \" + jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medianoId\": \"{{mediano_id}}\",\n    \"url\": \"https://example.com/photo.jpg\",\n    \"descripcion\": \"A test photo description for testing purposes\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/photos-service/api/fotos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"photos-service",
+								"api",
+								"fotos",
+								""
+							]
+						},
+						"description": "Create a new Photo linked to a Mediano.\n\n**Important:** Uses `{{mediano_id}}` from Medianos Service.\n\n**Test Script:** Saves photo ID to `{{photo_id}}`.\n\n**Request Body:**\n```json\n{\n    \"medianoId\": \"uuid-of-mediano\",\n    \"url\": \"https://example.com/photo.jpg\",\n    \"descripcion\": \"Photo description (5-200 chars)\"\n}\n```\n\n**Expected Response:**\n```json\n{\n    \"id\": 1,\n    \"medianoId\": \"uuid-of-mediano\",\n    \"url\": \"https://example.com/photo.jpg\",\n    \"descripcion\": \"Photo description\"\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Photos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/photos-service/api/fotos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"photos-service",
+								"api",
+								"fotos",
+								""
+							]
+						},
+						"description": "Retrieve all photos from the database"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Photo by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/photos-service/api/fotos/{{photo_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"photos-service",
+								"api",
+								"fotos",
+								"{{photo_id}}"
+							]
+						},
+						"description": "Get a specific photo by ID.\n\n**Uses:** `{{photo_id}}` variable"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Photos by Mediano ID (Feign)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/photos-service/api/fotos/mediano/{{mediano_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"photos-service",
+								"api",
+								"fotos",
+								"mediano",
+								"{{mediano_id}}"
+							]
+						},
+						"description": "Get all photos associated with a specific Mediano.\n\n**Uses:** OpenFeign to communicate between Photos and Medianos services.\n\n**Expected Response:**\n```json\n[\n    {\n        \"id\": 1,\n        \"title\": \"Test Photo\",\n        \"medianoId\": 1,\n        \"medianoName\": \"Test Mediano\"\n    }\n]\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medianoId\": \"{{mediano_id}}\",\n    \"url\": \"https://example.com/updated-photo.jpg\",\n    \"descripcion\": \"Updated photo description\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/photos-service/api/fotos/{{photo_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"photos-service",
+								"api",
+								"fotos",
+								"{{photo_id}}"
+							]
+						},
+						"description": "Update an existing photo"
+					},
+					"response": []
+				},
+				{
+					"name": "Photos Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/photos-service/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"photos-service",
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Check Photos Service health through Gateway"
+					},
+					"response": []
+				}
+			],
+			"description": "Photos management with OpenFeign integration\n\n**Base Path:** `/photos-service/api/photos`\n\n**Operations:**\n- POST / - Create photo\n- GET / - List all photos\n- GET /{id} - Get by ID\n- GET /mediano/{medianoId} - Get photos by mediano (Feign)\n- PUT /{id} - Update photo\n- \n\n**Feign Integration:**\nPhotos Service uses OpenFeign to fetch Mediano details from Medianos Service."
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "mediano_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "photo_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
