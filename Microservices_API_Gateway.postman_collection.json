@@ -352,6 +352,40 @@
 					"response": []
 				},
 				{
+					"name": "Get Mediano with Photos (Resilience4j Test)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/medianos-service/api/medianos/{{mediano_id}}/fotos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"medianos-service",
+								"api",
+								"medianos",
+								"{{mediano_id}}",
+								"fotos"
+							]
+						},
+						"description": "**Resilience4j Testing Endpoint**\n\nThis endpoint demonstrates Retry and Circuit Breaker patterns.\n\n**Retry Pattern:**\n- Max attempts: 3\n- Wait: 500ms, 1s, 2s (exponential backoff)\n\n**Circuit Breaker:**\n- Opens after 50% failure rate (minimum 5 calls)\n- Half-open after 10 seconds\n- Fallback returns empty photos array\n\n**Test Instructions:**\n1. Create a mediano and photos first\n2. Stop photos-service\n3. Call this endpoint - observe 3 retries in logs\n4. Make 5 calls - circuit opens\n5. 6th call fails fast (no retries)\n6. Start photos-service and wait 10s\n7. Circuit closes after 3 successful calls\n\n**Expected Response (when photos-service is down):**\n```json\n{\n    \"id\": \"uuid\",\n    \"nombre\": \"Test Mediano\",\n    \"altura\": 130,\n    \"email\": \"test@example.com\",\n    \"photos\": []  // Empty when service is down\n}\n```"
+					},
+					"response": []
+				},
+				{
 					"name": "Update Mediano",
 					"request": {
 						"auth": {
