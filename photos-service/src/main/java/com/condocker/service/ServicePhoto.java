@@ -19,6 +19,11 @@ public class ServicePhoto implements IServicePhoto{
         return photosDao.findAll();
     }
 
+    @Override
+    public List<Photo> getPhotosByMedianoId(String medianoId) {
+        return photosDao.findByMedianoId(medianoId);
+    }
+
 //    @Override
 //    public void addPhoto(PhotoDTO photo) {
 //        Mediano mediano = medianoDao.

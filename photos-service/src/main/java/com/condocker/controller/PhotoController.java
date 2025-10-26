@@ -15,10 +15,20 @@ public class PhotoController {
     private IServicePhoto servicePhoto;
 
     @GetMapping("/")
-    public List<Photo> getPhoto(@PathVariable String idmediano) {
+    public List<Photo> getAllPhotos() {
         return servicePhoto.getPhotos();
-
     }
+
+    /**
+     * Get all photos for a specific mediano
+     * @param medianoId The mediano's ID
+     * @return List of photos belonging to the mediano
+     */
+    @GetMapping("/mediano/{medianoId}")
+    public List<Photo> getPhotosByMedianoId(@PathVariable String medianoId) {
+        return servicePhoto.getPhotosByMedianoId(medianoId);
+    }
+
     /*
     @PostMapping("/")
     public void createPhoto(@RequestBody PhotoDTO photo) {

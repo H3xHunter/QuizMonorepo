@@ -2,6 +2,7 @@ package com.condocker.service;
 
 
 import com.condocker.dto.MedianoDTO;
+import com.condocker.dto.MedianoWithPhotosDTO;
 import com.condocker.entity.Mediano;
 
 import java.util.List;
@@ -13,5 +14,11 @@ public interface IMedianoService {
     public Optional<Mediano> removeMediano(String id);
     public Optional<Mediano> getMedianoById(String id);
     public Optional<Mediano> getByName(String nombre);
-    //public List<Photo> getPhotosMediano(String id);
+
+    /**
+     * Get mediano with all associated photos (using Feign client)
+     * @param id The mediano's ID
+     * @return Mediano with photos
+     */
+    public MedianoWithPhotosDTO getMedianoWithPhotos(String id);
 }

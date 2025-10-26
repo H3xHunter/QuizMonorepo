@@ -1,12 +1,17 @@
 package com.condocker.service.impl;
 
+import com.condocker.client.PhotosFeignClient;
 import com.condocker.dto.MedianoDTO;
+import com.condocker.dto.MedianoWithPhotosDTO;
+import com.condocker.dto.PhotoResponseDTO;
 import com.condocker.entity.Mediano;
 import com.condocker.exceptions.NameException;
 import com.condocker.repo.IMediano;
 import com.condocker.service.IMedianoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,8 +21,8 @@ public class ServiceMedianoImpl implements IMedianoService {
     @Autowired
     private IMediano medianoDao;
 
-    //@Autowired
-    //private IPhotosDao photosDao;
+    @Autowired
+    private PhotosFeignClient photosFeignClient;
 
     @Override
     public List<MedianoDTO> getMedianos(){
@@ -65,9 +70,24 @@ public class ServiceMedianoImpl implements IMedianoService {
         return medianoDao.findMedianoByName(nombre);
     }
 
-//    @Override
-//    public List<Photo> getPhotosMediano(String id) {
-//        return photosDao.findByMedianoId(id);
-//    }
+    @Override
+    public MedianoWithPhotosDTO getMedianoWithPhotos(String id) {
+        // Get mediano from database
+        Mediano mediano = medianoDao.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Mediano no encontrado"));
+
+        // Get photos from Photos Service using Feign client
+        List<PhotoResponseDTO> photos = photosFeignClient.getPhotosByMedianoId(id);
+
+        // Build response DTO
+        return new MedianoWithPhotosDTO(
+                mediano.getId(),
+                mediano.getName(),
+                mediano.getHeight(),
+                mediano.getEmail(),
+                photos
+        );
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.condocker.controller;
 
 import com.condocker.dto.MedianoDTO;
+import com.condocker.dto.MedianoWithPhotosDTO;
 import com.condocker.entity.Mediano;
 import com.condocker.service.IMedianoService;
 import jakarta.validation.Valid;
@@ -35,9 +36,24 @@ public class MedianoController {
         return mediano.getByName(nombre).orElse(null);
     }
 
-//    @GetMapping("/fotos/{idMediano}")
-//    public List<Photo> fotos(@PathVariable String idMediano){
-//        return this.mediano.getPhotosMediano(idMediano);
-//    }
+    /**
+     * Get mediano by ID
+     * @param id The mediano's ID
+     * @return Mediano entity
+     */
+    @GetMapping("/{id}")
+    public Mediano getMedianoById(@PathVariable String id){
+        return mediano.getMedianoById(id).orElse(null);
+    }
+
+    /**
+     * Get mediano with all associated photos (inter-service communication via Feign)
+     * @param id The mediano's ID
+     * @return Mediano with list of photos
+     */
+    @GetMapping("/{id}/fotos")
+    public MedianoWithPhotosDTO getMedianoWithPhotos(@PathVariable String id){
+        return mediano.getMedianoWithPhotos(id);
+    }
 
 }

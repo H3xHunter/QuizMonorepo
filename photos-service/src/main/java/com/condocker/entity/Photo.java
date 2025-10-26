@@ -22,6 +22,10 @@ public class Photo {
     @CreationTimestamp
     private LocalDate created;
 
+    // Foreign key reference to Mediano service (microservice pattern)
+    @Column(name = "mediano_id")
+    private String medianoId;
+
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name="mediano_id", nullable = false)
 //    @JsonIgnore
