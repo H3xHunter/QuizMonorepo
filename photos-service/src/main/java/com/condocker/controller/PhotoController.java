@@ -14,7 +14,7 @@ public class PhotoController {
     @Autowired
     private IServicePhoto servicePhoto;
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public List<Photo> getAllPhotos() {
         return servicePhoto.getPhotos();
     }

@@ -18,12 +18,12 @@ public class MedianoController {
     private IMedianoService mediano;
 
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public List<MedianoDTO> getMedianos(){
         return mediano.getMedianos();
 
     }
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     public ResponseEntity<?> addMediano(@RequestBody @Valid
                                         MedianoDTO medianoDTO){
         System.out.println(medianoDTO);

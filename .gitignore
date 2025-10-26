@@ -66,3 +66,4 @@ application-local.properties
 # Claude Code
 CLAUDE.md
 /TODO.md
+/Microservices_API_Gateway.postman_collection.json

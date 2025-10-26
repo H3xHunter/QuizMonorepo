@@ -11,11 +11,13 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # Rutas se agregarán cuando migremos los servicios
+        # Route to Eureka Server web interface
         - id: eureka-web
           uri: http://localhost:8761
           predicates:
             - Path=/eureka/**
+          filters:
+            - RewritePath=/eureka(?<segment>/?.*), $\{segment}
       globalcors:
         cors-configurations:
           '[/**]':
