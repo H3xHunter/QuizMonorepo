@@ -51,14 +51,11 @@ public class PhotoController {
     /**
      * Get photo by ID
      * @param id The photo's ID
-     * @return The photo or 404
+     * @return The photo
      */
     @GetMapping("/{id}")
     public ResponseEntity<PhotoDTO> getPhotoById(@PathVariable("id") Long id) {
         Photo photo = servicePhoto.getPhotoById(id);
-        if (photo == null) {
-            return ResponseEntity.notFound().build();
-        }
         PhotoDTO response = new PhotoDTO(
                 photo.getId(),
                 photo.getMedianoId(),
@@ -72,14 +69,11 @@ public class PhotoController {
      * Update a photo
      * @param id The photo's ID
      * @param photoDTO Updated photo data
-     * @return The updated photo or 404
+     * @return The updated photo
      */
     @PutMapping("/{id}")
     public ResponseEntity<PhotoDTO> updatePhoto(@PathVariable("id") Long id, @RequestBody @Valid PhotoDTO photoDTO) {
         Photo updated = servicePhoto.updatePhoto(id, photoDTO);
-        if (updated == null) {
-            return ResponseEntity.notFound().build();
-        }
         PhotoDTO response = new PhotoDTO(
                 updated.getId(),
                 updated.getMedianoId(),
@@ -92,14 +86,11 @@ public class PhotoController {
     /**
      * Delete a photo
      * @param id The photo's ID
-     * @return 200 OK if deleted, 404 if not found
+     * @return 200 OK if deleted
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePhoto(@PathVariable("id") Long id) {
-        boolean deleted = servicePhoto.deletePhoto(id);
-        if (deleted) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        servicePhoto.deletePhoto(id);
+        return ResponseEntity.ok().build();
     }
 }

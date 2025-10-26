@@ -5,6 +5,8 @@ import com.condocker.dto.MedianoDTO;
 import com.condocker.dto.MedianoWithPhotosDTO;
 import com.condocker.dto.PhotoResponseDTO;
 import com.condocker.entity.Mediano;
+import com.condocker.exceptions.DuplicateMedianoException;
+import com.condocker.exceptions.MedianoNotFoundException;
 import com.condocker.exceptions.NameException;
 import com.condocker.repo.IMediano;
 import com.condocker.service.IMedianoService;
@@ -49,7 +51,7 @@ public class ServiceMedianoImpl implements IMedianoService {
                 medianoDao.findMedianoByName(mediano.getName())
                         .orElse(null);
         if(busqueda!=null) {
-            throw new NameException("El mediano ya existe");
+            throw new DuplicateMedianoException(mediano.getName());
         }
         //INSERT INTO MEDIANOS VALUES (nombre,altura)
         return medianoDao.save(mediano);
@@ -79,8 +81,7 @@ public class ServiceMedianoImpl implements IMedianoService {
     public MedianoWithPhotosDTO getMedianoWithPhotos(String id) {
         // Get mediano from database
         Mediano mediano = medianoDao.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Mediano no encontrado"));
+                .orElseThrow(() -> new MedianoNotFoundException(id));
 
         // Get photos from Photos Service using Feign client
         List<PhotoResponseDTO> photos = photosFeignClient.getPhotosByMedianoId(id);
